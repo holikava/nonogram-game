@@ -1,6 +1,5 @@
-import { createElement } from "./helpers/createElement";
-import { displayNonogram } from "./helpers/displayNonogram";
-import { playSound } from "./helpers/playSound";
+import { createElement, playSound } from "./scripts/helpers";
+import { displayNonogram } from "./scripts/displayNonogram";
 
 import clickSound from "./../assets/click-on-cell.mp3";
 

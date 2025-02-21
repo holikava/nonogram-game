@@ -1,4 +1,4 @@
-import { createElement } from "./createElement";
+import { createElement } from "./helpers";
 
 export class Cell {
     constructor() {

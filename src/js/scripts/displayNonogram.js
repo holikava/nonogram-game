@@ -1,4 +1,4 @@
-import { createElement } from "./createElement";
+import { createElement } from "./helpers";
 import { Cell } from "./cellClass";
 
 export const displayNonogram = (size) => {
