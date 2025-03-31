@@ -6,7 +6,7 @@ export class Cell {
     }
 
     create() {
-        let elem = createElement("button", "playfield__cell");
+        let elem = createElement("button", "cell");
         elem.setAttribute("value", this.status);
         return elem;
     }

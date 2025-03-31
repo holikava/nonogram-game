@@ -3,15 +3,9 @@ import { Cell } from "./cellClass";
 
 export const displayNonogram = (size) => {
   const game = createNonogram(size);
-  const wrapper = document.querySelector(".playfield__wrapper");
-  wrapper.innerHTML = "";
-  const playfield = createElement("div", "playfield", "");
-  if (size === 10) {
-    playfield.classList.add("medium-level");
-  }
-  if (size === 15) {
-    playfield.classList.add("hard-level");
-  }
+  const wrapper = document.querySelector('.playfield__wrapper');
+  const playfield = document.querySelector(".playfield");
+  playfield.innerHTML = "";
   game.map((item) => playfield.appendChild(item.create()));
   wrapper.appendChild(playfield);
 
@@ -20,12 +14,13 @@ export const displayNonogram = (size) => {
 
 const displayClue = (game, size) => {
   const matrix = make2DArray(game, size);
+  matrix.map((row) => addDividingLines(row, "row"));
   const topNums = [];
   for (let i = 0; i < size; i++) {
     const col = matrix.map((row) => row[i]);
     topNums.push(cellCounter(col));
+    addDividingLines(col, "column");
   }
-
   topNums.forEach((nums, index) => {
     createClueElems(matrix[0][index], nums, "clue__wrapper clue_top");
   });
@@ -72,9 +67,22 @@ const make2DArray = (arr, size) => {
 
 const createNonogram = (size) => {
   let arrLength = Math.pow(size, 2);
-  const nonogram = new Array(arrLength).fill().map((item) => {
+  const nonogram = new Array(arrLength).fill().map(() => {
     let elem = new Cell();
     return elem;
   });
   return nonogram;
+};
+
+const addDividingLines = (arr, indicator) => {
+  for (let i = 0; i < arr.length; i++) {
+    if (i === 4 || i === 9 || i === 14) {
+      if (indicator === "row") {
+        arr[i].classList.add("divider-rows");
+      }
+      if (indicator === "column") {
+        arr[i].classList.add("divider-cols");
+      }
+    }
+  }
 };
