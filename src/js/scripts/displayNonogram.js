@@ -8,9 +8,26 @@ export const displayNonogram = (size) => {
   playfield.innerHTML = "";
   game.map((item) => playfield.appendChild(item.create()));
   wrapper.appendChild(playfield);
-
+  displayPlayfield(size);
   displayClue(Array.from(playfield.childNodes), size);
 };
+
+const displayPlayfield = (size) => {
+  const playfield = document.querySelector(".playfield");
+  playfield.classList = '';
+  switch (size) {
+    case 5:
+      playfield.classList = 'playfield easy-level';
+      break;
+    case 10:
+      playfield.classList = 'playfield medium-level';
+      break;
+    case 15:
+      playfield.classList = 'playfield hard-level';
+      break;
+    default: return;
+  }
+}
 
 const displayClue = (game, size) => {
   const matrix = make2DArray(game, size);
@@ -24,7 +41,6 @@ const displayClue = (game, size) => {
   topNums.forEach((nums, index) => {
     createClueElems(matrix[0][index], nums, "clue__wrapper clue_top");
   });
-
   const sideNums = matrix.map((row) => cellCounter(row));
   sideNums.forEach((nums, index) => {
     createClueElems(matrix[index][0], nums, "clue__wrapper clue_side");
@@ -57,23 +73,6 @@ const cellCounter = (arr) => {
   return result;
 };
 
-const make2DArray = (arr, size) => {
-  const result = [];
-  for (let i = 0; i < arr.length; i += size) {
-    result.push(arr.slice(i, i + size));
-  }
-  return result;
-};
-
-const createNonogram = (size) => {
-  let arrLength = Math.pow(size, 2);
-  const nonogram = new Array(arrLength).fill().map(() => {
-    let elem = new Cell();
-    return elem;
-  });
-  return nonogram;
-};
-
 const addDividingLines = (arr, indicator) => {
   for (let i = 0; i < arr.length; i++) {
     if (i === 4 || i === 9 || i === 14) {
@@ -85,4 +84,21 @@ const addDividingLines = (arr, indicator) => {
       }
     }
   }
+};
+
+const createNonogram = (size) => {
+  const arrLength = Math.pow(size, 2);
+  const nonogram = new Array(arrLength).fill().map(() => {
+    let elem = new Cell();
+    return elem;
+  });
+  return nonogram;
+};
+
+const make2DArray = (arr, size) => {
+  const result = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
 };

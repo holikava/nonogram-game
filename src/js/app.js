@@ -1,6 +1,6 @@
 import { createElement, playSound } from "./scripts/helpers";
 import { displayNonogram } from "./scripts/displayNonogram";
-import { myTimer, timerRun } from "./scripts/timer";
+import { myTimer, timerRun, resetTimer } from "./scripts/timer";
 import clickSound from "./../assets/click-on-cell.mp3";
 
 const levels = ["easy", "medium", "hard"];
@@ -16,16 +16,16 @@ const timerSeparator = createElement("span", "timer__separator", " : ");
 const playfieldWrapper = createElement("div", "playfield__wrapper", "");
 const playfield = createElement("div", "playfield easy-level", "");
 const btnsWrapper = createElement("div", "btns__wrapper", "");
-const saveGameBtn = createElement("button", "btn btn_save-game", "Save game");
+const saveGameBtn = createElement("button", "btn btn__save-game", "Save game");
 const continueGameBtn = createElement(
   "button",
-  "btn btn_continue-game",
+  "btn btn__continue-game",
   "Continue game"
 );
-const newGameBtn = createElement("button", "btn btn_new-game", "New game");
+const newGameBtn = createElement("button", "btn bt__new-game", "New game");
 const showSolutionBtn = createElement(
   "button",
-  "btn btn_show-solution",
+  "btn btn__show-solution",
   "Show solution"
 );
 
@@ -52,9 +52,11 @@ let size = 5;
 
 const setNewGame = () => {
   clearTimeout(myTimer);
-  timerMin.innerText = "00";
-  timerSec.innerText = "00";
+  resetTimer(timerMin, timerSec);
   displayNonogram(size);
+  if (showSolutionBtn.innerText === 'Hide solution') {
+    showSolutionBtn.innerText = 'Show solution';
+  }
 };
 
 const displayLevels = (target, arr) => {
@@ -70,49 +72,41 @@ const displayLevels = (target, arr) => {
 };
 
 const setLevel = (e) => {
-  e.preventDefault();
-  let value = e.target.id;
-  if (value === "hard-level") {
-    size = 15;
-  } else if (value === "medium-level") {
-    size = 10;
-  } else {
-    size = 5;
+  const value = e.target.id;
+  switch (value) {
+    case 'easy-level':
+      size = 5
+      break;
+    case "medium-level":
+      size = 10;
+      break;
+    case "hard-level":
+      size = 15;
+      break;
+    default: return;
   }
-  setPlayfieldSize();
   setNewGame();
-};
-
-const setPlayfieldSize = () => {
-  if (size === 15) {
-    playfield.classList = "playfield hard-level";
-  } else if (size === 10) {
-    playfield.classList = "playfield medium-level";
-  } else {
-    playfield.classList = "playfield easy-level";
-  }
-};
+}
 
 const playfieldActions = () => {
+  const playfield = document.querySelector('.playfield');
   playfield.addEventListener("click", timerRun, { once: true });
   playfield.addEventListener("click", (e) => {
     e.preventDefault();
-    playSound(clickSound);
-    console.log(e.target)
     if (e.target.closest('.cell')) {
       e.target.classList.toggle("selected");
     }
+    playSound(clickSound);
   });
 };
 
 const showSolution = () => {
-  const btn = document.querySelector(".btn_show-solution");
+  const btn = document.querySelector(".btn__show-solution");
   const cells = playfield.querySelectorAll(".cell");
   if (btn.innerText === "Show solution") {
     btn.innerText = "Hide solution";
     playfield.classList.add("disable");
     cells.forEach((cell) => {
-      console.log(cell)
       if (cell.value === "1") {
         cell.classList.add("right-cell");
       } else {
@@ -130,32 +124,27 @@ const showSolution = () => {
 };
 
 const saveCurrentGame = () => {
-  const data = JSON.stringify(playfieldWrapper.innerHTML);
-  localStorage.setItem("savedGame", data);
-  localStorage.setItem("gameSize", size);
-  localStorage.setItem(
-    "timerMin",
-    document.querySelector(".timer__min").innerText
-  );
-  localStorage.setItem(
-    "timerSec",
-    document.querySelector(".timer__sec").innerText
-  );
+  const gameObj = {};
+  gameObj.playfield = playfieldWrapper.innerHTML;
+  gameObj.timerMin = document.querySelector(".timer__min").innerText;
+  gameObj.timerSec = document.querySelector(".timer__sec").innerText;
+  localStorage.setItem('savedGame', JSON.stringify(gameObj));
 };
 
 const continueSavedGame = () => {
+  if (!localStorage.getItem("savedGame")) {
+    return;
+  }
   clearTimeout(myTimer);
   const savedData = JSON.parse(localStorage.getItem("savedGame"));
-  playfieldWrapper.innerHTML = savedData;
-  size = localStorage.getItem("gameSize");
-  setPlayfieldSize();
-  timerMin.innerText = localStorage.getItem("timerMin");
-  timerSec.innerText = localStorage.getItem("timerSec");
-  playfield.addEventListener("click", timerRun, { once: true });
+  playfieldWrapper.innerHTML = savedData.playfield;
+  timerMin.innerText = savedData.timerMin;
+  timerSec.innerText = savedData.timerSec;
+  playfieldActions();
 };
 
 displayLevels(levelsWrapper, levels);
-displayNonogram(size);
+setNewGame();
 playfieldActions();
 
 showSolutionBtn.addEventListener("click", showSolution);

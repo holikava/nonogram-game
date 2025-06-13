@@ -25,3 +25,8 @@ export const timerRun = () => {
     myTimer = setTimeout(timerFn, 1000);
   }, 1000);
 };
+
+export const resetTimer = (min, sec) => {
+  min.innerText = "00";
+  sec.innerText = "00";
+}
